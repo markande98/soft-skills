@@ -5,8 +5,8 @@
 
 # Different Caching Approaches
 
-* Cache aside
-
+* Cache-aside
+* Write-through
 
 
 
@@ -28,3 +28,20 @@
 * Data is written directly to a data store, which can cause cache data stale. To overcome this we can use TTL (Time To Live) to force to update the data after TTL expires.
 * When a node is added to a system, it will increase the latency as the cache is empty and most of the queries will result in the cache-miss.
 
+
+### Write-through
+<p>In this strategy, an application uses the cache as the main data source to read and write. Cache sits between application and data store. The cache is responsible to read and write to the database.
+</p>
+
+![Write-through](https://codeahoy.com/img/write-through.png)
+
+<p> The application adds or updates an entry to the cache, then cache works with sync, it also adds or updates the same entry to the data store. Cache returns the entry to the application. Write-through slows overall operation due to the write operation because the application first writes to cache then cache writes to the data store. Once data is written to cache, subsequent reads become fast for the same data.
+</p>
+
+
+#### pros
+* Data in the cache is not more stale.
+
+#### cons
+* When a new node is created due to failing, the new node will not have cache entries until the entry is updated in the database.
+* It is possible that most of the written data to cache might not be read.
