@@ -45,3 +45,16 @@
 #### cons
 * When a new node is created due to failing, the new node will not have cache entries until the entry is updated in the database.
 * It is possible that most of the written data to cache might not be read.
+
+### Write-behind (Write-back)
+<p>This strategy is kind of similar to the write-through strategy but cache does not synchronously update the data store with the application while it does asynchronously to improve the write performance. It is used in the application which has heavy write loads.
+</p>
+
+![Write-behind](https://codeahoy.com/img/write-back.png)
+
+#### pros
+* It improves the write performance of the application.
+
+#### cons
+* We can have the possibility of data loss, if cache goes down before data is written to the data store.
+* It is difficult to implement as compared to other caching strategies.  
