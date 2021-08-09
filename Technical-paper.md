@@ -75,3 +75,15 @@
 #### cons
 * When data is requested for the first time, it always result in cache-miss and incurs the penalty of loading data to cache.
 * It is also possible for data to become inconsistent between cache and database and it can be resolved by write-through strategy.
+
+
+
+## Reference Links
+1. https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/
+
+2. https://medium.com/system-design-blog/what-is-caching-1492abb92143
+
+3. https://codeahoy.com/img/cache-aside.png
+4. https://codeahoy.com/img/write-through.png
+5. https://codeahoy.com/img/write-back.png
+6. https://codeahoy.com/img/read-through.png
