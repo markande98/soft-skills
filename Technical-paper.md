@@ -6,8 +6,9 @@
 # Different Caching Approaches
 
 * Cache-aside
-* Write-through
-
+* Write-Through
+* Write-Behind (Write-Back)
+* Read-Through
 
 
 
@@ -29,7 +30,7 @@
 * When a node is added to a system, it will increase the latency as the cache is empty and most of the queries will result in the cache-miss.
 
 
-### Write-through
+### Write-Through
 <p>In this strategy, an application uses the cache as the main data source to read and write. Cache sits between application and data store. The cache is responsible to read and write to the database.
 </p>
 
@@ -46,7 +47,7 @@
 * When a new node is created due to failing, the new node will not have cache entries until the entry is updated in the database.
 * It is possible that most of the written data to cache might not be read.
 
-### Write-behind (Write-back)
+### Write-Behind (Write-Back)
 <p>This strategy is kind of similar to the write-through strategy but cache does not synchronously update the data store with the application while it does asynchronously to improve the write performance. It is used in the application which has heavy write loads.
 </p>
 
@@ -58,3 +59,19 @@
 #### cons
 * We can have the possibility of data loss, if cache goes down before data is written to the data store.
 * It is difficult to implement as compared to other caching strategies.  
+
+### Read-Through
+<p>Read-Through cache sits in-line with the database. Whenever there is a cache-miss, it loads the missing data from the data store then it updates the cache about that data and finally return to the application. It loads the data lazily when it is first read.
+</p>
+
+![Read-Through](https://codeahoy.com/img/read-through.png)
+
+<p>It is kind of similar to the cache-aside strategy but in cache-aside, the application is responsible for fetching data from the database and also populates the cache but in read-through it is done by some library or stand-alone cache provider. It works best for ready-heavy workloads.</p>
+
+#### pros
+* An application can also work after the cache failure but the performance would not be up to the mark in that case, as it will need to retrieve the data from the database.
+* Due to the lazy loading nature, only the requested data is cached which avoids filling up the cache with data that is not required.
+
+#### cons
+* When data is requested for the first time, it always result in cache-miss and incurs the penalty of loading data to cache.
+* It is also possible for data to become inconsistent between cache and database and it can be resolved by write-through strategy.
