@@ -538,13 +538,330 @@ DROP TABLE IF EXISTS mytable;
 ```
 
 ---
+# Important concepts in SQL:
+
+## ACID properties:
+
+* Atomicity
+* Consistency
+* Isolation
+* Durability
+
+### Atomicity:
+<p>A transaction is an atomic unit; hence, all the instructions within a transaction will successfully execute, or none of them will execute. The following transaction transfers 20 dollars from Alice’s bank account to Bob’s bank account. If any of the instructions fail, the entire transaction should abort and rollback.
+</p>
+
+| T1 |
+| :-: |
+| Read(A_bal) |
+| A_bal -= 20 |
+| Write(A_bal) |
+| Read(B_bal) |
+| B_bal += 20 |
+| Write(B_bal) |
+
+```
+A transaction to transfer 20 pounds from Alice's account to Bob's account.
+```
+
+### Consistency:
+<p>A database is initially in a consistent state, and it should remain consistent after every transaction. Suppose that the transaction in the previous example fails after Write(A_b) and the transaction is not rolled back; then, the database will be inconsistent as the sum of Alice and Bob’s money, after the transaction, will not be equal to the amount of money they had before the transaction.
+</p>
+
+### Isolation:
+<p>If the multiple transactions are running concurrently, they should not be affected by each other; i.e., the result should be the same as the result obtained if the transactions were running sequentially. Suppose B_bal is initially 100. If a context switch occurs after B_bal *= 20, then the changes should only be visible to T2 once T1 commits. This ensures consistency in the data and prevents incorrect results.
+</p>
+
+| T1 | T2 |
+| :-: | :-: |   
+| Read(B_bal) | Read(B_bal) |
+| B_bal *= 0.2 | B_bal += 20 |
+| Write(B_bal) | Write(B_bal) |
+
+```
+T1 adds 20% interest to Bob's savings account and T2 adds 20 pounds to Bob's account.
+```
+
+### Durability:
+<p>Changes that have been committed to the database should remain even in the case of software and system failure. For instance, if Bob’s account contains $120, this information should not disappear upon system or software failure.
+</p>
+
+---
+## CAP Theorem:
+<p>The CAP theorem (also called Brewer’s theorem) states that a distributed database system can only guarantee two out of these three characteristics: Consistency, Availability, and Partition Tolerance.
+</p>
+
+![CAP](https://www.educative.io/cdn-cgi/image/f=auto,fit=contain,w=3000/api/edpresso/shot/6661082609352704/image/5676830073815040.png)
+
+### Consistency:
+<p>A system is said to be consistent if all nodes see the same data at the same time.
+
+Simply, if we perform a read operation on a consistent system, it should return the value of the most recent write operation. This means that, the read should cause all nodes to return the same data, i.e., the value of the most recent write.
+</p>
+
+### Availability:
+<p>Availability in a distributed system ensures that the system remains operational 100% of the time. Every request gets a (non-error) response regardless of the individual state of a node.
+</p>
+
+### Partial Tolerance:
+<p>
+This condition states that the system does not fail, regardless of if messages are dropped or delayed between nodes in a system.
+
+Partition tolerance has become more of a necessity than an option in distributed systems. It is made possible by sufficiently replicating records across combinations of nodes and networks.
+</p>
+
+---
+
+## Normalization:
+<p>It is the process of reducing the redundancy of data in the data table and improving data integrity.</p>
+
+<p>There are various normal forms which helps us to normalizes the table</p>
+
+* 1st Normal Form (1NF)
+* 2nd Normal Form (2NF)
+* 3rd Normal Form (3NF)
+* Boyce-Codd Normal Form (BCNF)
+
+### 1NF:
+<p>In this Normal Form, we tackle the problem of atomicity. Here atomicity means values in the table should not be further divided. In simple terms, a single cell cannot hold multiple values. If a table contains a composite or multi-valued attribute, it violates the First Normal Form.</p>
+
+### 2NF:
+<p>First it has to be in 1NF and should not contain any partial dependency. Here partial dependency means the proper subset of candidate key determines a non-prime attribute. 
+</p>
+
+### 3NF:
+<p>Same here, first it has to be in the 2NF. The other condition is there should be no transitive dependency for non-prime attributes. That means non-prime attributes (which doesn’t form a candidate key) should not be dependent on other non-prime attributes in a given table. So a transitive dependency is a functional dependency in which X → Z (X determines Z) indirectly, by virtue of X → Y and Y → Z (where it is not the case that Y → X).</p>
+
+### BCNF:
+<p>It is also known as 3.5NF. Its the higher version 3NF and was developed by Raymond F. Boyce and Edgar F. Codd to address certain types of anomalies which were not dealt with 3NF.</p>
+
+<p>In BCNF if every functional dependency A → B, then A has to be the Super Key of that particular table.</p>
+
+---
+# Indexes:
+<p>An index is a schema object. It is used by the server to speed up the retrieval of rows by using a pointer. It can reduce disk I/O(input/output) by using a rapid path access method to locate data quickly. An index helps to speed up select queries and where clauses, but it slows down data input, with the update and the insert statements. Indexes can be created or dropped with no effect on the data.</p>
+
+<p>Let's see some syntax oh how to create, remove and alter an index.</p>
+
+### Creating an index:
+
+```sql
+CREATE INDEX index
+ ON TABLE column;
+```
+<p>where the index is the name given to that index and TABLE is the name of the table on which that index is created and column is the name of that column for which it is applied.</p>
+
+---
+### Unique index:
+
+```sql
+CREATE UNIQUE INDEX index
+ ON TABLE column;
+```
+---
+<p>Unique indexes are used for the maintenance of the integrity of the data present in the table as well as for the fast performance, it does not allow multiple values to enter into the table. </p>
+
+---
+### Removing an index:
+
+```sql
+DROP INDEX index;
+```
+<p>To drop an index, we must be the owner of the index.</p>
+
+---
+### When should index be created:
+* If column has wide range of values.
+* If column does not contain large number of null values.
+* One or more columns are frequently used together in where clause and join condition.
+
+---
+### When should indexes be avoided:
+* If table is small or column updated frequently.
+* Columns are not often used as a condition in the query.
+
+---
+# Transactions:
+<p>A transaction is a sequence of steps or tasks performed on a database as a single unit. If any of these tasks are not performed, the whole unit is rolled back to its previous state. Otherwise, the changes are updated in the database. In simpler terms, it is “ALL or NONE”.</p>
+
+<p>A database transaction has four main properties that should be maintained while writing a transaction. These are called ACID properties as we discussed earlier.</p>
+
+## Transaction control commands:
+* BEGIN
+* COMMIT
+* ROLLBACK
+* SAVE
+
+### BEGIN:
+<p> We assign a starting point to a transaction using the BEGIN TRANSACTION statement. After beginning, the transaction will either be committed or rolled back.
+
+Consider the sample table (students_table) that has the two entries shown below:</p>
+
+| student_id | student_name |
+| :-: | :-: |
+| 1 | abc |
+| 2 | def |
+
+### COMMIT:
+<p>The ending point of a transaction is marked using the COMMIT command. It is used to update changes made by the transaction in the database and saves all modifications made until the last COMMIT or ROLLBACK command. This can be seen below:</p>
+
+```sql
+BEGIN TRANSACTION
+UPDATE students_table
+SET student_name = 'xyz' 
+WHERE student_id = 1
+COMMIT
+```
+
+<p>Result:</p>
+
+| student_id | student_name |
+| :-: | :-: |
+| 1 | xyz |
+| 2 | def |
+
+### ROLLBACK:
+<p>In case of any failure or error during the transaction, we use the ROLLBACK command to undo all modifications made till the last COMMIT or ROLLBACK command. It would look like this:</p>
+
+```sql
+DELETE FROM students_table
+WHERE student_id = 1
+ROLLBACK
+```
+
+<p>Result:</p>
+
+| student_id | student_name |
+| :-: | :-: |
+| 1 | xyz |
+| 2 | def |
+
+### SAVE:
+<p>To save the current state of the database in a transaction, use the SAVE TRANSACTION. In case of any failure in the transaction, it is used to roll back to the previous save point without rolling back the complete transaction. This process is shown below:</p>
+
+```sql
+SAVE TRANSACTION point1
+DELETE FROM students_table WHERE student_id = 1
+
+SAVE TRANSACTION point2
+DELETE FROM students_table WHERE student_id = 2
+
+ROLLBACK TRANSACTION point1
+        --OR
+ROLLBACK TRANSACTION point2
+```
+
+<p>Result:</p>
+
+| student_id | student_name |
+| :-: | :-: |
+| 1 | xyz |
+| 2 | def |
+
+```
+Rollback to savepoint "point1"
+```
+
+| student_id | student_name |
+| :-: | :-: |
+| 2 | def |
+
+```
+Rollback to savepoint "point2"
+```
+
+* All changes are made in the temporary database. To make them permanent, we need to COMMIT them.
+* The BEGIN TRANSACTION can also be written as BEGIN TRANS.
+* By default, all DML commands (INSERT, UPDATE, DELETE) are auto-committed unless we define a transaction.
+
+---
+# Locking mechanism:
+<p>Locking is essential to successful SQL Server transactions processing and it is designed to allow SQL Server to work seamlessly in a multi-user environment. Locking is the way that SQL Server manages transaction concurrency. Essentially, locks are in-memory structures which have owners, types, and the hash of the resource that it should protect. A lock as an in-memory structure is 96 bytes in size.</p>
+
+## Lock modes:
+* Exclusive(X)
+* Shared(S)
+* Update(U)
+* Intent(I)
+
+### Exclusive lock (X):
+<p>This lock type, when imposed, will ensure that a page or row will be reserved exclusively for the transaction that imposed the exclusive lock, as long as the transaction holds the lock.
+
+The exclusive lock will be imposed by the transaction when it wants to modify the page or row data, which is in the case of DML statements DELETE, INSERT and UPDATE. An exclusive lock can be imposed to a page or row only if there is no other shared or exclusive lock imposed already on the target. This practically means that only one exclusive lock can be imposed to a page or row, and once imposed no other lock can be imposed on locked resources.</p>
+
+### Shared lock (S):
+<p>this lock type, when imposed, will reserve a page or row to be available only for reading, which means that any other transaction will be prevented to modify the locked record as long as the lock is active. However, a shared lock can be imposed by several transactions at the same time over the same page or row and in that way several transactions can share the ability for data reading since the reading process itself will not affect anyhow the actual page or row data. In addition, a shared lock will allow write operations, but no DDL changes will be allowed.</p>
+
+### Update lock (U):
+<p>this lock is similar to an exclusive lock but is designed to be more flexible in a way. An update lock can be imposed on a record that already has a shared lock. In such a case, the update lock will impose another shared lock on the target row. Once the transaction that holds the update lock is ready to change the data, the update lock (U) will be transformed to an exclusive lock (X). It is important to understand that update lock is asymmetrical in regards of shared locks. While the update lock can be imposed on a record that has the shared lock, the shared lock cannot be imposed on the record that already has the update lock.</p>
+
+### Intent lock (I):
+<p>this lock is a means used by a transaction to inform another transaction about its intention to acquire a lock. The purpose of such lock is to ensure data modification to be executed properly by preventing another transaction to acquire a lock on the next in hierarchy object. In practice, when a transaction wants to acquire a lock on the row, it will acquire an intent lock on a table, which is a higher hierarchy object. By acquiring the intent lock, the transaction will not allow other transactions to acquire the exclusive lock on that table (otherwise, exclusive lock imposed by some other transaction would cancel the row lock).</p>
+
+---
+# Database Isolation Levels:
+<p>Isolation determines how transaction integrity is visible to other users and systems. It means that a transaction should take place in a system in such a way that it is the only transaction that is accessing the resources in a database system.</p>
+
+<p>The SQL standard defines four isolation levels.</p>
+
+## Read Uncommitted:
+<p>Read Uncommitted is the lowest isolation level. In this level, one transaction may read not yet committed changes made by other transaction, thereby allowing dirty reads. In this level, transactions are not isolated from each other.</p>
+
+## Read Committed:
+<p>This isolation level guarantees that any data read is committed at the moment it is read. Thus it does not allows dirty read. The transaction holds a read or write lock on the current row, and thus prevent other transactions from reading, updating or deleting it.</p>
+
+## Repeatable Read:
+<p>This is the most restrictive isolation level. The transaction holds read locks on all rows it references and writes locks on all rows it inserts, updates, or deletes. Since other transaction cannot read, update or delete these rows, consequently it avoids non-repeatable read.</p>
+
+## Serializable:
+<p>This is the Highest isolation level. A serializable execution is guaranteed to be serializable. Serializable execution is defined to be an execution of operations in which concurrently executing transactions appears to be serially executing.</p>
+
+---
+# Triggers:
+<p>A trigger is a stored procedure - which is a set of SQL statements saved under a name, just like a function, so that it can be reused - that is executed automatically when a certain event occurs in a database.</p>
+
+## Types of Triggers:
+
+1. Event
+* DML Trigger: It fires when a DML (Database Manipulation Language) event is specified (INSERT/UPDATE/DELETE)
+* DDL Trigger: It fires when a DDL (Database Definition Language) event is specified (CREATE/ALTER)
+* DATABASE Trigger: It fires when a database event is specified (LOGON/LOGOFF/STARTUP/SHUTDOWN)
+
+2. Timing
+* BEFORE Trigger: It fires before the specified event has occurred.
+* AFTER Trigger: It fires after a specified event has occurred.
+* INSTEAD OF Trigger: It lets you skip a statement and execute a different statement present in the trigger body instead.
+
+3. Level
+* STATEMENT level Trigger: It fires one time for a specified event statement.
+* ROW level Trigger: It fires for each record that was affected in a specified event. (only for DML)
+
+### SQL Implementation:
+<p>A trigger is implemented in the given code which will be fired before anything is inserted in the people table. This trigger makes sure that a person does not have a negative age and sets the age to zero.</p>
+
+```sql
+CREATE TABLE people (
+  age INT, 
+  name varchar(150)
+);
+
+delimiter //
+CREATE TRIGGER agecheck BEFORE INSERT ON people FOR EACH ROW IF NEW.age < 0 THEN SET NEW.age = 0; END 
+IF; //
+
+INSERT INTO people VALUES (-20, 'Sid'), (30, 'Josh');
+select * from people;
+```
+
+---
 # REFERENCES:
 * https://sqlbolt.com/
 * https://www.datacamp.com/community/tutorials/10-command-line-utilities-postgresql
 * https://www.geeksforgeeks.org/sql-join-set-1-inner-left-right-and-full-joins/
 * https://sqlbolt.com/lesson/select_queries_with_aggregates
 * https://sqlbolt.com/lesson/select_queries_order_of_execution
-
-
-
+* https://www.edureka.co/blog/normalization-in-sql/#1stNF
+* https://www.geeksforgeeks.org/sql-indexes/
+* https://www.sqlshack.com/locking-sql-server/
+* https://www.geeksforgeeks.org/transaction-isolation-levels-dbms/
 
